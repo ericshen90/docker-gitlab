@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+ gitlab-postgresql:
+   image: sameersbn/postgresql:9.5-3
+   environment:
+      - DB_NAME=gitlabhq_production
+      - DB_USER=gitlab
+      - DB_PASS=password
+      - DB_EXTENSION=pg_trgm
+   volumes:
+      - ./gitlab/postgresql:/var/lib/postgresql
+      - /etc/localtime:/etc/localtime
+ gitlab-redis:
+   image: sameersbn/redis:latest
+   volumes:
+      - ./gitlab/redis:/var/lib/redis
+      - /etc/localtime:/etc/localtime
+ gitlab:
+   image: sameersbn/gitlab:8.9.4
+   depends_on:
+    - gitlab-redis
+    - gitlab-postgresql
+   environment:
+      - DB_ADAPTER=postgresql
+      - DB_HOST=gitlab-postgresql
+      - DB_PORT=5432
+      - DB_USER=gitlab
+      - DB_PASS=password
+      - DB_NAME=gitlabhq_production
+
+      - REDIS_HOST=gitlab-redis
+      - REDIS_PORT=6379
+      
+      - GITLAB_TIMEZONE=Beijing
+      - GITLAB_HOST=192.168.50.105
+      - GITLAB_PORT=10080
+      - GITLAB_SSH_PORT=10022
+      - GITLAB_SECRETS_DB_KEY_BASE=6a9e975ddf9173ff63c81040834dbbcf594c757b1fb52d57696058a5d7748436d13b341c71ba2208434a7846675ab750ef38cbf56a2934d620a936cc838e92e7
+      - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
+      - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
+      - GITLAB_BACKUPS=daily
+   volumes:
+      - ./gitlab/data:/home/git/data
+      - /etc/localtime:/etc/localtime
+   ports:
+      - "10022:22"
+      - "80:80"
