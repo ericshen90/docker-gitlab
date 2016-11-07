@@ -2,6 +2,8 @@
 
 # Docker-Gitlab部署
 
+基于docker镜像sameersbn/docker-gitlab
+
 ### Quick Start
 
 使用docker-compose快速启动Gitlab
@@ -89,6 +91,8 @@ $ psql -d  gitlabhq_production  -f  /XXXX/dump.sql gitlab
 
 将老的gitlab的repositories文件拷贝到宿主机的/xxx/data/下，/xxx/data/为compose中配置的路径
 
+注意这里要删除掉项目目录下的hook*目录
+
 然后登陆到gitlab容器
 
 ```
@@ -99,5 +103,11 @@ $ docker exec -it gitlab_gitlab_1 bash
 
 ```
 $ sudo -u git -H bundle exec rake gitlab:import:repos RAILS_ENV=production
+```
+
+可以运行下面命令检查
+
+```
+$ sudo -u git -H bundle exec rake gitlab:check RAILS_ENV=production  
 ```
 
